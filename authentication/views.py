@@ -1,4 +1,4 @@
-from .serializers import UserSerializer, EmailVerificationSerializer
+from .serializers import *
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics, status, views
@@ -12,7 +12,6 @@ from .utils import Util
 import jwt
 
 
-from django.contrib.sites.shortcuts import get_current_site
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = UserSerializer
@@ -44,21 +43,31 @@ class RegisterView(generics.GenericAPIView):
 
 class VerifyEmail(views.APIView):
     serializer_class = EmailVerificationSerializer
-    
-    token_param_config = openapi.Parameter('token', in_=openapi.IN_QUERY, description="description", type=openapi.TYPE_STRING)
-    
+
+    token_param_config = openapi.Parameter(
+        'token', in_=openapi.IN_QUERY, description='Description', type=openapi.TYPE_STRING)
+
     @swagger_auto_schema(manual_parameters=[token_param_config])
     def get(self, request):
         token = request.GET.get('token')
         try:
-            payload =  jwt.decode(token, settings.SECRET_KEY)
+            payload = jwt.decode(token, settings.SECRET_KEY)
             user = User.objects.get(id=payload['user_id'])
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-            return Response({"Email": "Successfully activated"},status=status.HTTP_200_OK)
+            return Response({'email': 'Successfully activated'}, status=status.HTTP_200_OK)
+        except jwt.ExpiredSignatureError as identifier:
+            return Response({'error': 'Activation Expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError as identifier:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class LogInView(generics.GenericAPIView):
+    serializer_class = LogInSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data=request.user)
+        serializer.is_valid(raise_exception=True)
         
-        except jwt.ExpiredSignatureError as identifir:
-            return Response({"Error": "Activation Link Expired"},status=status.HTTP_400_BAD_REQUEST)
-        except jwt.exceptions.DecodeError as identifir:
-            return Response({"Error": "Invalid Token"},status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
