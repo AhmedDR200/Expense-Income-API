@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'authentication',
 ]
 
@@ -137,8 +138,21 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'alshwwhy@gmail.com'
+# EMAIL_HOST_PASSWORD = 'wybnzseprcmvjypj'
+# EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP server's address
+EMAIL_PORT = 587  # Replace with the appropriate port for your SMTP server
+EMAIL_USE_TLS = True  # Set to True if your SMTP server requires TLS, or False for non-secure connections
+EMAIL_HOST_USER = 'djangotest810@gmail.com'  # Your email address used for sending emails
+EMAIL_HOST_PASSWORD = 'hvlvjdyfihcxbmjr'  # Your email password or app-specific password
+
+# Default "from" address for sent emails
+DEFAULT_FROM_EMAIL = 'djangotest810@gmail.com'  # This is the sender's email address
